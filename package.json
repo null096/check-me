@@ -1,14 +1,15 @@
 {
   "name": "check-me",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "test": "jest --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "compile": "babel src --out-dir lib",
     "dev": "cross-env NODE_ENV=development webpack",
     "prod": "cross-env NODE_ENV=production webpack",
-    "prepublish": "cross-env NODE_ENV=production npm run compile"
+    "prepare": "npm run test && cross-env NODE_ENV=production npm run compile"
   },
   "author": "",
   "license": "ISC",
