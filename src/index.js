@@ -11,6 +11,8 @@ class checkMe {
     this.textSeparators = this.text.match(/\s+/g);
     this.currentWordIndex = 0;
     this.isError = false;
+    this.isTextFinished = false;
+    this.isShouldCleanInputValue = false;
   }
 
   validateText(text) {
@@ -23,6 +25,59 @@ class checkMe {
     }
 
     return true;
+  }
+
+  onInput = (typedWord) => {
+    const {
+      currentWordIndex,
+      textParts
+    } = this;
+    const currentWord = textParts[currentWordIndex];
+    const typedWordTrimmed = typedWord.trim();
+    const isSpaceAtTheBeginnig = /^\s/.test(typedWord);
+    const isSpaceAtTheEnd = /\s$/.test(typedWord);
+    const isExactSameWords = typedWordTrimmed === currentWord;
+    const isLastWord = textParts.length - 1 === currentWordIndex;
+    const isWordsOk = isExactSameWords && !isSpaceAtTheBeginnig;
+    const isWordFinished = isWordsOk && isSpaceAtTheEnd;
+    const isTextFinished = isWordsOk && isLastWord;
+
+    if (isTextFinished) {
+      this.isError = false;
+      this.isTextFinished = true;
+      this.isShouldCleanInputValue = true;
+      return;
+    }
+
+    if (isWordFinished) {
+      this.isError = false;
+      this.currentWordIndex++;
+      this.isShouldCleanInputValue = true;
+      return;
+    }
+
+    if (!typedWord) {
+      this.isError = false;
+      this.isShouldCleanInputValue = false;
+      return;
+    }
+
+    if (isSpaceAtTheBeginnig || isSpaceAtTheEnd) {
+      this.isError = true;
+      this.isShouldCleanInputValue = false;
+      return;
+    }
+
+    for (let i = 0; i < typedWordTrimmed.length; i++) {
+      if (currentWord[i] !== typedWord[i]) {
+        this.isError = true;
+        this.isShouldCleanInputValue = false;
+        return;
+      }
+    }
+
+    this.isError = false;
+    this.isShouldCleanInputValue = false;
   }
 }
 
