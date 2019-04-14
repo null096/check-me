@@ -48,52 +48,44 @@ class checkMe {
     const isWordFinished = isWordsOk && isSpaceAtTheEnd;
     const isTextFinished = isWordsOk && isLastWord;
     const newTypedFromText = this.typedFromText + typedWordTrimmed.length;
+    // reset variables for further checks
+    this.isError = false;
+    this.typedFromCurrentWord = 0;
+    this.isShouldCleanInputValue = true;
 
+    // Best cases, when the word/text finished or input is empty
     if (isTextFinished) {
-      this.isError = false;
       this.isTextFinished = true;
-      this.isShouldCleanInputValue = true;
       this.typedFromText = newTypedFromText;
-      this.typedFromCurrentWord = 0;
       return;
     }
 
     if (isWordFinished) {
-      this.isError = false;
       this.currentWordIndex++;
-      this.isShouldCleanInputValue = true;
       // add 1, because of the space at the end
       this.typedFromText = newTypedFromText + 1;
-      this.typedFromCurrentWord = 0;
       return;
     }
+
+    this.isShouldCleanInputValue = false;
 
     if (!typedWord) {
-      this.isError = false;
-      this.isShouldCleanInputValue = false;
-      this.typedFromCurrentWord = 0;
       return;
     }
 
-    let isInputError = false;
-    let correctlyTypedInCurrentWord = 0;
+    // Worst cases, when the word is not fully typed or contains an error/spaces
     for (let i = 0; i < typedWordTrimmed.length; i++) {
       if (currentWord[i] !== typedWordTrimmed[i]) {
-        isInputError = true;
+        this.isError = true;
         break;
       }
-      correctlyTypedInCurrentWord++;
+      this.typedFromCurrentWord++;
     }
-    this.typedFromCurrentWord = correctlyTypedInCurrentWord;
 
     if (isSpaceAtTheBeginnig || isSpaceAtTheEnd) {
       this.isError = true;
-      this.isShouldCleanInputValue = false;
       return;
     }
-
-    this.isError = isInputError;
-    this.isShouldCleanInputValue = false;
   }
 }
 
