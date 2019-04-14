@@ -13,6 +13,8 @@ class checkMe {
     this.isError = false;
     this.isTextFinished = false;
     this.isShouldCleanInputValue = false;
+    this.typedFromText = 0;
+    this.typedFromCurrentWord = 0;
   }
 
   validateText(text) {
@@ -25,6 +27,10 @@ class checkMe {
     }
 
     return true;
+  }
+
+  get allTyped() {
+    return this.typedFromText + this.typedFromCurrentWord;
   }
 
   onInput = (typedWord) => {
@@ -41,11 +47,14 @@ class checkMe {
     const isWordsOk = isExactSameWords && !isSpaceAtTheBeginnig;
     const isWordFinished = isWordsOk && isSpaceAtTheEnd;
     const isTextFinished = isWordsOk && isLastWord;
+    const newTypedFromText = this.typedFromText + typedWordTrimmed.length;
 
     if (isTextFinished) {
       this.isError = false;
       this.isTextFinished = true;
       this.isShouldCleanInputValue = true;
+      this.typedFromText = newTypedFromText;
+      this.typedFromCurrentWord = 0;
       return;
     }
 
@@ -53,14 +62,29 @@ class checkMe {
       this.isError = false;
       this.currentWordIndex++;
       this.isShouldCleanInputValue = true;
+      // add 1, because of the space at the end
+      this.typedFromText = newTypedFromText + 1;
+      this.typedFromCurrentWord = 0;
       return;
     }
 
     if (!typedWord) {
       this.isError = false;
       this.isShouldCleanInputValue = false;
+      this.typedFromCurrentWord = 0;
       return;
     }
+
+    let isInputError = false;
+    let correctlyTypedInCurrentWord = 0;
+    for (let i = 0; i < typedWordTrimmed.length; i++) {
+      if (currentWord[i] !== typedWordTrimmed[i]) {
+        isInputError = true;
+        break;
+      }
+      correctlyTypedInCurrentWord++;
+    }
+    this.typedFromCurrentWord = correctlyTypedInCurrentWord;
 
     if (isSpaceAtTheBeginnig || isSpaceAtTheEnd) {
       this.isError = true;
@@ -68,15 +92,7 @@ class checkMe {
       return;
     }
 
-    for (let i = 0; i < typedWordTrimmed.length; i++) {
-      if (currentWord[i] !== typedWord[i]) {
-        this.isError = true;
-        this.isShouldCleanInputValue = false;
-        return;
-      }
-    }
-
-    this.isError = false;
+    this.isError = isInputError;
     this.isShouldCleanInputValue = false;
   }
 }
